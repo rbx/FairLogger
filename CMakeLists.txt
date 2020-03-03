@@ -22,21 +22,10 @@ set_fairlogger_defaults()
 
 include(CTest)
 
-option(USE_BOOST_PRETTY_FUNCTION "Use Boost BOOST_PRETTY_FUNCTION macro" OFF)
 option(USE_EXTERNAL_FMT "Use external fmt library instead of the bundled one" OFF)
 ################################################################################
 
 # Dependencies #################################################################
-if(USE_BOOST_PRETTY_FUNCTION)
-  if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
-    # Since Boost 1.70 a CMake package is shipped by default. Unfortunately, it has a number
-    # of problems that are only fixed in Boost 1.71 or CMake 3.15. By default we skip the
-    # BoostConfig lookup. This can be overridden on the command line via -DBoost_NO_BOOST_CMAKE=OFF
-    set(Boost_NO_BOOST_CMAKE ON)
-  endif()
-  find_package2(PUBLIC Boost REQUIRED)
-endif()
-
 if(USE_EXTERNAL_FMT)
   find_package2(PUBLIC fmt REQUIRED VERSION 5.3.0)
 endif()
@@ -53,11 +42,6 @@ add_library(FairLogger
   logger/Logger.cxx
   logger/Logger.h
 )
-
-if(USE_BOOST_PRETTY_FUNCTION)
-  target_link_libraries(FairLogger PUBLIC Boost::boost)
-  target_compile_definitions(FairLogger PUBLIC FAIRLOGGER_USE_BOOST_PRETTY_FUNCTION)
-endif()
 
 # legacy paths
 list(APPEND FAIRLOGGER_INSTALL_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
@@ -162,15 +146,7 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
   message(STATUS "  ${Cyan}DEPENDENCY FOUND     VERSION                   PREFIX${CR}")
   foreach(dep IN LISTS PROJECT_PACKAGE_DEPENDENCIES)
     if(${dep}_VERSION)
-      if(${dep} STREQUAL Boost)
-        if(Boost_VERSION_MAJOR)
-          set(version_str "${BGreen}${${dep}_VERSION_MAJOR}.${${dep}_VERSION_MINOR}${CR}")
-        else()
-          set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
-        endif()
-      else()
-        set(version_str "${BGreen}${${dep}_VERSION}${CR}")
-      endif()
+      set(version_str "${BGreen}${${dep}_VERSION}${CR}")
     else()
       set(version_str "${BYellow}unknown${CR}")
     endif()
@@ -183,14 +159,7 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     else()
       pad("${version_str}${version_req_str}" 25 " " version_padded COLOR 1)
     endif()
-    if(${dep} STREQUAL Boost)
-      if(TARGET Boost::headers)
-        get_target_property(boost_include Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
-      else()
-        get_target_property(boost_include Boost::boost INTERFACE_INCLUDE_DIRECTORIES)
-      endif()
-      get_filename_component(prefix ${boost_include}/.. ABSOLUTE)
-    elseif(${dep} STREQUAL fmt)
+    if(${dep} STREQUAL fmt)
       get_target_property(fmt_include fmt::fmt INTERFACE_INCLUDE_DIRECTORIES)
       get_filename_component(prefix ${fmt_include}/.. ABSOLUTE)
     else()

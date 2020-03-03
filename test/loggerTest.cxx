@@ -12,7 +12,6 @@
 #include <thread>
 
 using namespace std;
-using namespace fair;
 
 void printEverySeverity()
 {
@@ -24,16 +23,12 @@ void printEverySeverity()
     LOG(state) << "state message "   << i++;
     LOG(info)  << "info message "    << i++;
     LOG(debug) << "debug message "   << i++;
-    LOG(debug1) << "debug1 message "   << i++;
-    LOG(debug2) << "debug2 message "   << i++;
-    LOG(debug3) << "debug3 message "   << i++;
-    LOG(debug4) << "debug4 message "   << i++;
     LOG(trace) << "trace message "   << i++;
 }
 
 void printAllVerbositiesWithSeverity(Severity sev)
 {
-    Logger::SetConsoleSeverity(sev);
+    Logger::SetSeverity(sev);
 
     cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'verylow' verbosity..." << endl;
     Logger::SetVerbosity(Verbosity::verylow);
@@ -50,23 +45,11 @@ void printAllVerbositiesWithSeverity(Severity sev)
     cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'veryhigh' verbosity..." << endl;
     Logger::SetVerbosity(Verbosity::veryhigh);
     printEverySeverity();
-    cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'user1' verbosity..." << endl;
-    Logger::SetVerbosity(Verbosity::user1);
-    printEverySeverity();
-    cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'user2' verbosity..." << endl;
-    Logger::SetVerbosity(Verbosity::user2);
-    printEverySeverity();
-    cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'user3' verbosity..." << endl;
-    Logger::SetVerbosity(Verbosity::user3);
-    printEverySeverity();
-    cout << endl << "cout: >>> testing severity '" << Logger::SeverityName(sev) << "' with 'user4' verbosity..." << endl;
-    Logger::SetVerbosity(Verbosity::user4);
-    printEverySeverity();
 }
 
 void silentlyPrintAllVerbositiesWithSeverity(Severity sev)
 {
-    Logger::SetConsoleSeverity(sev);
+    Logger::SetSeverity(sev);
 
     Logger::SetVerbosity(Verbosity::verylow);
     printEverySeverity();
@@ -78,33 +61,13 @@ void silentlyPrintAllVerbositiesWithSeverity(Severity sev)
     printEverySeverity();
     Logger::SetVerbosity(Verbosity::veryhigh);
     printEverySeverity();
-    Logger::SetVerbosity(Verbosity::user1);
-    printEverySeverity();
-    Logger::SetVerbosity(Verbosity::user2);
-    printEverySeverity();
-    Logger::SetVerbosity(Verbosity::user3);
-    printEverySeverity();
-    Logger::SetVerbosity(Verbosity::user4);
-    printEverySeverity();
 }
 
 int main()
 {
-    Logger::SetConsoleColor(true);
-
-    auto spec = VerbositySpec::Make(VerbositySpec::Info::file_line_function,
-                                    VerbositySpec::Info::process_name,
-                                    VerbositySpec::Info::process_name);
-    cout << "Defining custom verbosity \"user2\"" << endl;
-    Logger::DefineVerbosity(Verbosity::user2, spec);
-
     cout << "cout: testing severities..." << endl;
 
     printAllVerbositiesWithSeverity(Severity::trace);
-    printAllVerbositiesWithSeverity(Severity::debug4);
-    printAllVerbositiesWithSeverity(Severity::debug3);
-    printAllVerbositiesWithSeverity(Severity::debug2);
-    printAllVerbositiesWithSeverity(Severity::debug1);
     printAllVerbositiesWithSeverity(Severity::debug);
     printAllVerbositiesWithSeverity(Severity::info);
     printAllVerbositiesWithSeverity(Severity::state);
@@ -114,95 +77,28 @@ int main()
 
     cout << endl;
     cout << "cout: setting severity to 'info' and verbosity to 'medium'" << endl;
-    Logger::SetConsoleSeverity(Severity::info);
+    Logger::SetSeverity(Severity::info);
     Logger::SetVerbosity(Verbosity::medium);
 
-    cout << "cout: is logging trace: " << fair::Logger::Logging(Severity::trace) << endl;
-    cout << "cout: is logging debug4: " << fair::Logger::Logging(Severity::debug) << endl;
-    cout << "cout: is logging debug3: " << fair::Logger::Logging(Severity::debug) << endl;
-    cout << "cout: is logging debug2: " << fair::Logger::Logging(Severity::debug) << endl;
-    cout << "cout: is logging debug1: " << fair::Logger::Logging(Severity::debug) << endl;
-    cout << "cout: is logging debug: " << fair::Logger::Logging(Severity::debug) << endl;
-    cout << "cout: is logging info: " << fair::Logger::Logging(Severity::info) << endl;
-    cout << "cout: is logging state: " << fair::Logger::Logging(Severity::state) << endl;
-    cout << "cout: is logging warn: " << fair::Logger::Logging(Severity::warn) << endl;
-    cout << "cout: is logging error: " << fair::Logger::Logging(Severity::error) << endl;
-    cout << "cout: is logging fatal: " << fair::Logger::Logging(Severity::fatal) << endl;
-    cout << "cout: is logging nolog: " << fair::Logger::Logging(Severity::nolog) << endl;
+    cout << "cout: is logging trace: " << Logger::Logging(Severity::trace) << endl;
+    cout << "cout: is logging debug: " << Logger::Logging(Severity::debug) << endl;
+    cout << "cout: is logging info: " << Logger::Logging(Severity::info) << endl;
+    cout << "cout: is logging state: " << Logger::Logging(Severity::state) << endl;
+    cout << "cout: is logging warn: " << Logger::Logging(Severity::warn) << endl;
+    cout << "cout: is logging error: " << Logger::Logging(Severity::error) << endl;
+    cout << "cout: is logging fatal: " << Logger::Logging(Severity::fatal) << endl;
+    cout << "cout: is logging nolog: " << Logger::Logging(Severity::nolog) << endl;
 
     for (int i = 0; i < 1000000; ++i) {
         silentlyPrintAllVerbositiesWithSeverity(Severity::nolog);
     }
     cout << endl;
     cout << "cout: setting severity to 'trace' and verbosity to 'veryhigh'" << endl;
-    Logger::SetConsoleSeverity(Severity::trace);
+    Logger::SetSeverity(Severity::trace);
     Logger::SetVerbosity(Verbosity::veryhigh);
-
-    cout << endl;
-    cout << "cout: testing conditional logging..." << endl;
-    int x = 0;
-    LOG(info) << "x = " << x << " (initial)";
-    LOG_IF(info, (x == 0)) << "incrementing x to " << ++x;
-    LOG(info) << "x = " << x << " (after increment)";
-    LOG_IF(info, (x == 0)) << "this should not be printed and x not incremented: " << ++x;
-    LOG(info) << "x = " << x << " (after conditional increment)";
-
-    cout << endl;
-    cout << "cout: setting severity to 'nolog'" << endl;
-    Logger::SetConsoleSeverity(Severity::nolog);
-
-    cout << "cout: ----------------------------" << endl;
-    cout << "cout: open log file with severity 'error'" << endl;
-    Logger::InitFileSink(Severity::error, "test_log", true);
-    printEverySeverity();
-    cout << "cout: closing log file" << endl;
-    Logger::RemoveFileSink();
-
-
-    cout << "cout: setting severity to 'nolog'" << endl;
-    Logger::SetConsoleSeverity(Severity::nolog);
-    cout << "cout: ----------------------------" << endl;
-    cout << "cout: adding custom sink with error severity" << endl << endl;
-
-    Logger::AddCustomSink("CustomSink", "error", [](const string& content, const LogMetaData& metadata)
-    {
-        cout << "CustomSink: content: " << content << endl;
-
-        cout << "CustomSink: available metadata: " << endl;
-        cout << "CustomSink: \tstd::time_t timestamp: " << metadata.timestamp << endl;
-        cout << "CustomSink: \tstd::chrono::microseconds us: " << metadata.us.count() << endl;
-        cout << "CustomSink: \tstd::string process_name: " << metadata.process_name << endl;
-        cout << "CustomSink: \tstd::string file: " << metadata.file << endl;
-        cout << "CustomSink: \tstd::string line: " << metadata.line << endl;
-        cout << "CustomSink: \tstd::string func: " << metadata.func << endl;
-        cout << "CustomSink: \tstd::string severity_name: " << metadata.severity_name << endl;
-        cout << "CustomSink: \tfair::Severity severity: " << static_cast<int>(metadata.severity) << endl;
-    });
-
-    printEverySeverity();
-
-    cout << endl << "cout: removing custom sink with info severity" << endl;
-
-    Logger::AddCustomSink("CustomSink", Severity::error, [](const string& /*content*/, const LogMetaData& /*metadata*/){});
-    Logger::RemoveCustomSink("CustomSink");
-    Logger::RemoveCustomSink("bla");
-
-    cout << "cout: setting severity to 'trace'" << endl;
-    Logger::SetConsoleSeverity(Severity::trace);
 
     LOGF(info, "Hello {} {}!", "world", ":-)");
     LOGP(info, "Hello %s %s!", "world", ":-)");
-
-    cout << "cout: setting verbosity to 'high'" << endl;
-    Logger::SetVerbosity(Verbosity::high);
-
-    LOGV(info, verylow) << "I should be printed with very low verbosity";
-
-    cout << "cout: pushing 4 new lines with LOGN() in info verbosity" << endl;
-    LOGN(info);
-    LOGN(info);
-    LOGN(info);
-    LOGN(info);
 
     return 0;
 }
